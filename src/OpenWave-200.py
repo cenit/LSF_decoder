@@ -58,21 +58,21 @@ class Window(QtGui.QWidget):
         self.canvas = FigureCanvas(self.figure)
         self.canvas.setMinimumSize(800,  400)
 
-        self.toolbar = NavigationToolbar(self.canvas, self)
-        self.toolbar.hide()
+        #self.toolbar = NavigationToolbar(self.canvas, self)
+        #self.toolbar.hide()
 
         #Zoom In/out and Capture Buttons
-        self.zoomBtn = QtGui.QPushButton('Zoom')
-        self.zoomBtn.setFixedSize(100, 30)
-        self.zoomBtn.clicked.connect(self.toolbar.zoom)
+        #self.zoomBtn = QtGui.QPushButton('Zoom')
+        #self.zoomBtn.setFixedSize(100, 30)
+        #self.zoomBtn.clicked.connect(self.toolbar.zoom)
 
-        self.panBtn = QtGui.QPushButton('Pan')
-        self.panBtn.setFixedSize(100, 30)
-        self.panBtn.clicked.connect(self.toolbar.pan)
+        #self.panBtn = QtGui.QPushButton('Pan')
+        #self.panBtn.setFixedSize(100, 30)
+        #self.panBtn.clicked.connect(self.toolbar.pan)
 
-        self.homeBtn = QtGui.QPushButton('Home')
-        self.homeBtn.setFixedSize(100, 30)
-        self.homeBtn.clicked.connect(self.toolbar.home)
+        #self.homeBtn = QtGui.QPushButton('Home')
+        #self.homeBtn.setFixedSize(100, 30)
+        #self.homeBtn.clicked.connect(self.toolbar.home)
 
         self.captureBtn = QtGui.QPushButton('Capture')
         self.captureBtn.setFixedSize(100, 50)
@@ -127,15 +127,15 @@ class Window(QtGui.QWidget):
 
         # set the layout
         self.waveLayout = QtGui.QHBoxLayout()
-        self.waveLayout.addWidget(self.canvas)
+        #self.waveLayout.addWidget(self.canvas)
 
         self.wave_box=QtGui.QVBoxLayout()
         self.wave_box.addLayout(self.waveLayout)
 
         self.wavectrlLayout = QtGui.QHBoxLayout()
-        self.wavectrlLayout.addWidget(self.zoomBtn)
-        self.wavectrlLayout.addWidget(self.panBtn)
-        self.wavectrlLayout.addWidget(self.homeBtn)
+        #self.wavectrlLayout.addWidget(self.zoomBtn)
+        #self.wavectrlLayout.addWidget(self.panBtn)
+        #self.wavectrlLayout.addWidget(self.homeBtn)
         self.wavectrlLayout.addWidget(self.captureBtn)
 
         self.saveloadLayout = QtGui.QHBoxLayout()
@@ -359,16 +359,9 @@ class Window(QtGui.QWidget):
 
 if __name__ == '__main__':
     global portNum
-
-    f = open('license.txt', 'r')
-    print('-----------------------------------------------------------------------------');
-    print f.read()
-    f.close()
-    print('-----------------------------------------------------------------------------');
     print('OpenWave-200 V%s\n'% __version__)
     dso=dso200.Dso200()
 
-    #Search and make a connection with COM port.
     portNum=dso.ScanComPort() #Scan COM port.
     app = QtGui.QApplication(sys.argv)
     main = Window()

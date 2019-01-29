@@ -5,33 +5,24 @@ Copyright:
 ----------------------------------------------------------------------
 dso200 is Copyright (c) 2014 Good Will Instrument Co., Ltd All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify it under the terms 
-of the GNU Lesser General Public License as published by the Free Software Foundation; 
+This program is free software; you can redistribute it and/or modify it under the terms
+of the GNU Lesser General Public License as published by the Free Software Foundation;
 either version 2.1 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU Lesser General Public License for more details.
 
-You can receive a copy of the GNU Lesser General Public License from 
+You can receive a copy of the GNU Lesser General Public License from
 http://www.gnu.org/
 
 Note:
-dso200 uses third party software which is copyrighted by its respective copyright holder. 
+dso200 uses third party software which is copyrighted by its respective copyright holder.
 For details see the copyright notice of the individual package.
 
 ----------------------------------------------------------------------
 Description:
 dso200 is a python driver module used to get waveform and image from DSO.
-
-Module imported:
-  1. Python 2.7.6
-  2. PySerial 2.7
-  3. Matplotlib 1.3.1
-  4. Numpy 1.8.0
-  5. PIL 1.1.7
-
-Version: 1.02
 
 Created on APR 23 2018
 
@@ -79,7 +70,7 @@ class Dso200:
         else:
             self.osname='win'
         generate_lut()
-        
+
     def ScanComPort(self):
         port_list=list(list_ports.comports())
         num=len(port_list)
@@ -113,7 +104,7 @@ class Dso200:
                                     print '-',
                                 self.IO.flushInput()              #Clear input buffer.
                                 time.sleep(0.1)
-                            
+
                             self.write('*IDN?\n')
                             name = self.read().split(',')         #Query *IDN?
                             print('%s connected!\n'% name[1])     #Print model name.
@@ -122,13 +113,13 @@ class Dso200:
                             return -1
         print('Device not found!')
         return -1
-        
+
     def write(self, str):
         self.IO.write(str)
-        
+
     def read(self):
         return self.IO.readline()
-    
+
     def clrBuf(self):
         while(True):              #Clear input buffer.
             num=self.IO.inWaiting()
@@ -225,7 +216,7 @@ class Dso200:
         if(header_on == True):
             if(index==0): #Getting first waveform => reset self.info.
                 self.info=[[], []]
-                
+
             self.info[index]=self.read().split(';')
             num=len(self.info[index])
             self.info[index][num-1]=self.info[index][num-2] #Convert info[] to csv compatible format.
