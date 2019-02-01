@@ -25,9 +25,11 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Convert LSF file to CSV')
   parser.add_argument('input_file', help='Input file (LSF format)')
   parser.add_argument('output_file', help='Output file (CSV format)')
+  parser.add_argument('--oldCSV', dest='oldCSV', default=False, action='store_true', help='Use original CSV output format', required=False)
+  parser.add_argument('--showPlot', dest='showPlot', default=False, action='store_true', help='Show the plot in a windows after conversion', required=False)
   args = parser.parse_args()
   if args.input_file is not None and args.output_file is not None:
-    a = du.oscilloscope_data(args.input_file, args.output_file)
+    a = du.oscilloscope_data(inputFileName=args.input_file, outputFileName=args.output_file, oldCSV=args.oldCSV, showPlot=args.showPlot)
   else:
     parser.print_help()
   a.run()

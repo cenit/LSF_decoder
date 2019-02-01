@@ -61,48 +61,48 @@ class Dso200:
     sCh=[s for s in info if "Source" in s]
     self.ch_list.append(sCh[0].split(',')[1])
     sVunit = [s for s in info if "Vertical Units" in s]
-    self.vunit[ch] =sVunit[0].split(',')[1]    #Get vertical units.
+    self.vunit[ch] =sVunit[0].split(',')[1]      #Get vertical units.
     sDv = [s for s in info if "Vertical Scale" in s]
-    self.vdiv[ch] = float(sDv[0].split(',')[1])  #Get vertical scale. => Voltage for ADC's single step.
+    self.vdiv[ch] = float(sDv[0].split(',')[1])  #Get vertical scale. => Voltage for ADC single step.
     sVpos=[s for s in info if "Vertical Position" in s]
     self.vpos[ch] =float(sVpos[0].split(',')[1]) #Get vertical position.
     sHpos = [s for s in info if "Horizontal Position" in s]
     self.hpos[ch] =float(sHpos[0].split(',')[1]) #Get horizontal position.
     sDt = [s for s in info if "Sampling Period" in s]
-    self.dt[ch]=float(sDt[0].split(',')[1])    #Get sample period.
+    self.dt[ch]=float(sDt[0].split(',')[1])      #Get sample period.
     dv1=self.vdiv[ch]/25
     vpos=int(self.vpos[ch]/dv1)+128
     num=int(self.points_num)
     for x in range(24):
       self.info[ch].append(info[x])
-    self.info[ch].append('Mode,Fast') #Convert info[] to csv compatible format.
+    self.info[ch].append('Mode,Fast')  #Convert info[] to csv compatible format.
     self.info[ch].append('Waveform Data')
     self.iWave[ch] = np.array(struct.unpack('<%sh' % (len(wave) // 2), wave))
-    for x in range(num):      #Convert 16 bits signed number to floating point number.
+    for x in range(num):               #Convert 16 bits signed number to floating point number.
       self.iWave[ch][x]-=vpos
     del wave
     return 1
 
 
 class oscilloscope_data():
-  def __init__(self, inputFileName, outputFileName):
+  def __init__(self, inputFileName, outputFileName, oldCSV=False, showPlot=False):
     self.inputFileName = inputFileName
     self.outputFileName = outputFileName
-    self.figure = plt.figure()
-    self.figure.set_facecolor('white')
-    self.typeFlag = True  # Initial state -> Get raw data
+    self.oldCSV = oldCSV
+    self.showPlot = showPlot
     self.dso = Dso200()
 
   def save_csv(self):
-    if(self.typeFlag == True):  # Save raw data to csv file.
-      num = len(self.dso.ch_list)
-      for ch in range(num):
-        if(self.dso.info[ch] == []):
-          print('Failed to save data, raw data information is required!')
-          return
-      print("Opening ", self.outputFileName, " to write CSV data")
-      f = open(self.outputFileName, 'w')
-      item = len(self.dso.info[0])
+    num = len(self.dso.ch_list)
+    for ch in range(num):
+      if(self.dso.info[ch] == []):
+        print('Failed to save data, raw data information is required!')
+        return
+    print("Opening ", self.outputFileName, " to write CSV data")
+    f = open(self.outputFileName, 'w')
+    item = len(self.dso.info[0])
+    if (self.oldCSV):
+      print("Using deprecated CSV file variant")
       #Write file header.
       f.write('%s,\r\n' % self.dso.info[0][0])
       for x in range(1,  25):
@@ -112,43 +112,52 @@ class oscilloscope_data():
         str += '\r\n'
         f.write(str)
       str = ''
-      if(num == 1):
-        str += ('%s,' % self.dso.info[0][25])
-      else:
-        for ch in range(num):
-          str += ('%s,,' % self.dso.info[ch][25])
+      for ch in range(num):
+        str += ('%s,' % self.dso.info[ch][25])
       str += '\r\n'
       f.write(str)
-      #Write raw data.
-      item = len(self.dso.iWave[0])
-      tenth = int(item/10)
-      n_tenth = tenth-1
-      for x in range(item):
-        str = ''
-        if(num == 1):
-          str += ('%s,' % self.dso.iWave[0][x])
+    else:
+      print("Using modern CSV file variant")
+    #Write raw data.
+    item = len(self.dso.iWave[0])
+    self.time = [[0] * item for i in range(num)]
+    my_time = [0.0] * num
+    for x in range(item):
+      str = ''
+      for ch in range(num):
+        if (self.oldCSV):
+          str += ('%s,' % self.dso.iWave[ch][x])
         else:
-          for ch in range(num):
-            str += ('%s,,' % self.dso.iWave[ch][x])
-        str += '\r\n'
-        f.write(str)
-        if(x == n_tenth):
-          n_tenth += tenth
-      f.close()
-      print('Done!')
+          self.time[ch][x] = my_time[ch]
+          str += ('%s\t%s' % (self.time[ch][x], self.dso.iWave[ch][x]))
+          my_time[ch] += self.dso.dt[ch]
+      str += '\r\n'
+      f.write(str)
+    f.close()
+    print('Done!')
 
   def load_lsf(self):
     self.dso.ch_list = []
     if os.path.exists(self.inputFileName):
       count = self.dso.readRawDataFile(self.inputFileName)
-      #Print diagnostic data
       if(count > 0):
         total_chnum = len(self.dso.ch_list)
         if(total_chnum == 0):
+          print('No channel found in file, error!!')
           return
+      else:
+        print('Empty file!')
     else:
       print('File not found!')
+
+  def show_plots(self):
+    num = len(self.dso.ch_list)
+    for ch in range(num):
+      plt.plot(self.time[ch], self.dso.iWave[ch])
+    plt.show()
 
   def run(self):
     self.load_lsf()
     self.save_csv()
+    if self.showPlot:
+      self.show_plots()
