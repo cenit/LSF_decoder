@@ -21,5 +21,5 @@ import decoder_utils as du
 
 
 if __name__ == '__main__':
-  a = du.oscilloscope_data()
+  a = du.oscilloscope_data("test.lsf", "test.csv")
   a.run()

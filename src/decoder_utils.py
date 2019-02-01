@@ -39,8 +39,8 @@ class Dso200:
 
   def readRawDataFile(self,  fileName):
     self.info=[[], []]
+    print("Opening ", fileName, " to read LSF data")
     f = open(fileName, 'rb')
-    size = os.path.getsize(fileName)
     info = []
 
     # Read file header.
@@ -84,8 +84,10 @@ class Dso200:
     return 1
 
 
-class oscilloscope_data:
-  def __init__(self, parent=None):
+class oscilloscope_data():
+  def __init__(self, inputFileName, outputFileName):
+    self.inputFileName = inputFileName
+    self.outputFileName = outputFileName
     self.figure = plt.figure()
     self.figure.set_facecolor('white')
     self.typeFlag = True  # Initial state -> Get raw data
@@ -93,13 +95,13 @@ class oscilloscope_data:
 
   def save_csv(self):
     if(self.typeFlag == True):  # Save raw data to csv file.
-      file_name = "test.csv"
       num = len(self.dso.ch_list)
       for ch in range(num):
         if(self.dso.info[ch] == []):
           print('Failed to save data, raw data information is required!')
           return
-      f = open(file_name, 'w')
+      print("Opening ", self.outputFileName, " to write CSV data")
+      f = open(self.outputFileName, 'w')
       item = len(self.dso.info[0])
       #Write file header.
       f.write('%s,\r\n' % self.dso.info[0][0])
@@ -139,10 +141,9 @@ class oscilloscope_data:
 
   def load_lsf(self):
     self.dso.ch_list = []
-    sFileName = "test.lsf"
-    if os.path.exists(sFileName):
+    if os.path.exists(self.inputFileName):
       print('Reading file...')
-      count = self.dso.readRawDataFile(sFileName)
+      count = self.dso.readRawDataFile(self.inputFileName)
       #Print diagnostic data
       if(count > 0):
         total_chnum = len(self.dso.ch_list)
@@ -153,6 +154,5 @@ class oscilloscope_data:
       print('File not found!')
 
   def run(self):
-    main = oscilloscope_data()
-    main.load_lsf()
-    main.save_csv()
+    self.load_lsf()
+    self.save_csv()
