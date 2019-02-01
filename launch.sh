@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python2 src/OpenWave-200.py
+python src/OpenWave-200.py
