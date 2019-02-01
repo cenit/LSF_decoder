@@ -1,2 +1,5 @@
 *.pyc
-ALL*/
+*.png
+*.csv
+*.lsf
+*.set
