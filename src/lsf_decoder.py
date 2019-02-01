@@ -18,8 +18,16 @@ You can receive a copy of the GNU Lesser General Public License from http://www.
 """
 
 import decoder_utils as du
+import argparse
 
 
 if __name__ == '__main__':
-  a = du.oscilloscope_data("test.lsf", "test.csv")
+  parser = argparse.ArgumentParser(description='Convert LSF file to CSV')
+  parser.add_argument('input_file', help='Input file (LSF format)')
+  parser.add_argument('output_file', help='Output file (CSV format)')
+  args = parser.parse_args()
+  if args.input_file is not None and args.output_file is not None:
+    a = du.oscilloscope_data(args.input_file, args.output_file)
+  else:
+    parser.print_help()
   a.run()

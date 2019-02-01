@@ -123,7 +123,6 @@ class oscilloscope_data():
       item = len(self.dso.iWave[0])
       tenth = int(item/10)
       n_tenth = tenth-1
-      percent = 10
       for x in range(item):
         str = ''
         if(num == 1):
@@ -135,21 +134,18 @@ class oscilloscope_data():
         f.write(str)
         if(x == n_tenth):
           n_tenth += tenth
-          print('%3d %% Saved\r' % percent),
-          percent += 10
       f.close()
+      print('Done!')
 
   def load_lsf(self):
     self.dso.ch_list = []
     if os.path.exists(self.inputFileName):
-      print('Reading file...')
       count = self.dso.readRawDataFile(self.inputFileName)
       #Print diagnostic data
       if(count > 0):
         total_chnum = len(self.dso.ch_list)
         if(total_chnum == 0):
           return
-        print(total_chnum)
     else:
       print('File not found!')
 
